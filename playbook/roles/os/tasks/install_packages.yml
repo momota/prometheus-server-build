@@ -1,0 +1,22 @@
+---
+- name: Install epel parckage for installing elasticsearch
+  yum:
+    name: epel-release
+    state: latest
+
+- name: Install parckage for installing elasticsearch
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+      - epel-release
+      - python-pip
+      - python-virtualenv
+
+- name: Install parckage for monitoring
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+      - dstat
+

@@ -1,0 +1,26 @@
+<source>
+  @type dstat
+  tag dstat.__HOSTNAME__
+  option -cmdgn
+  delay 5
+</source>
+
+<match dstat.**>
+  @type copy
+  <store>
+    @type elasticsearch
+    host  log01
+    port  9201
+    logstatsh_format true
+    logstatsh_prefix logstatsh
+    type_name        dstat
+    flush_interval   20
+  </store>
+
+  <store>
+    @type file
+    path  /tmp/fluent-dstat.log
+  </store>
+</match>
+
+@include /etc/td-agent/conf.d/*.conf

@@ -1,0 +1,71 @@
+---
+- name: Upgrade all packages
+  yum: name=* state=latest
+
+- name: Install parckage for setting OS by ansible
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - libselinux-python
+
+- name: Set up LANG
+  lineinfile: >
+    dest=/etc/sysconfig/i18n
+    regexp='^LANG=.*'
+    line='LANG=ja_JP.utf8'
+
+- name: Set up timezone
+  lineinfile: >
+    dest=/etc/sysconfig/clock
+    regexp='^ZONE=.*'
+    line='ZONE="Asia/Tokyo"'
+
+- name: Set up UTC
+  lineinfile: >
+    dest=/etc/sysconfig/clock
+    regexp='^UTC=.*'
+    line='UTC=false'
+
+- name: Link localtime
+  file: >
+    src=/usr/share/zoneinfo/Asia/Tokyo
+    dest=/etc/localtime
+    state=link
+    force=yes
+
+- name: Ensure iptables is terminated and disabled on boot.
+  service: name=iptables state=stopped enabled=no
+
+- name: Add hosts entry based on ansible inventory file
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+
+- name: Increase max number of file descriptors for installing fluentd
+  template:
+    src: limits.conf.j2
+    dest: "{{ ulimit.config_path }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: "{{ ulimit.config }}"
+  when: item.limits is defined
+
+#- name: reboot machine after change ulimits
+#  shell: sleep 2 && shutdown -r now "reboot by Ansible"
+#  async: 1
+#  poll: 0
+#  ignore_errors: true
+#
+#- name: waiting for a server to finish booting
+#  local_action:
+#    module: wait_for
+#      host={{ inventory_hostname }}
+#      delay=10
+#      timeout=300
+#      port=22

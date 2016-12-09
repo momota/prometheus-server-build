@@ -1,0 +1,43 @@
+---
+ulimit:
+  config_path: /etc/security/limits.conf
+  config:
+    - name: fluentd
+      limits:
+        - domain: root
+          type: soft
+          item: nofile
+          value: 65536
+        - domain: root
+          type: hard
+          item: nofile
+          value: 65536
+        - domain: '*'
+          type: soft
+          item: nofile
+          value: 65536
+        - domain: '*'
+          type: hard
+          item: nofile
+          value: 65536
+
+tdagent_plugins:
+  - fluent-plugin-df
+  - fluent-plugin-config-expander
+  - fluent-plugin-notifier
+  - fluent-plugin-graphite
+  - fluent-plugin-elasticsearch
+  - fluent-plugin-map
+  - fluent-plugin-dstat
+
+# prometheus
+prometheus_alertmanager_url: "http://localhost:9093/"
+prometheus_components:
+  - prometheus
+  - alertmanager
+  - node_exporter
+#prometheus_rule_files:
+#  this_is_rule_1_InstanceDown:
+#    src:  some/path/basic.rules
+#    dest: basic.rules
+#prometheus_alertmanager_conf: some/path/alertmanager.yml.j2

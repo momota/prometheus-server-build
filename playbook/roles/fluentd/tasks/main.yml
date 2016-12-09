@@ -1,0 +1,9 @@
+---
+- name: Add td-agent configuration
+  template:
+    src: td-agent.conf.j2
+    dest: /etc/td-agent/td-agent.conf
+    owner: td-agent
+    group: td-agent
+    mode: 0644
+    force: yes
